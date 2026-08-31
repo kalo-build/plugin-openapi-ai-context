@@ -1,0 +1,248 @@
+openapi: "3.1.0"
+info:
+  title: "Task Manager API"
+  version: "1.0.0"
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+    AuthTokens:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+      required: [access_token, refresh_token]
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+      required: [id, email, name]
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+      required: [email, name]
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, archived]
+        owner_id:
+          type: string
+          format: uuid
+      required: [id, name, status, owner_id]
+    ProjectCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+      required: [name]
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: "Log in with credentials"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags: [auth]
+      summary: "Refresh access token"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthTokens'
+      responses:
+        "200":
+          description: "Refreshed tokens"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: "List all users"
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "List of users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: "Create a new user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: "Get user by ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: "User details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: "Delete a user"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: "Deleted"
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: "List projects"
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "List of projects"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: "Create a project"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: "Get project by ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: "Project details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'

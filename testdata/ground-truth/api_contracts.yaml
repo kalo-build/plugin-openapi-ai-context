@@ -1,0 +1,40 @@
+base_path: /api/v1
+auth: Bearer JWT
+endpoints:
+  auth:
+    - method: POST
+      path: /auth/login
+      auth: false
+      body: LoginRequest
+      response: AuthTokens
+    - method: POST
+      path: /auth/refresh
+      auth: false
+      body: AuthTokens
+      response: AuthTokens
+  projects:
+    - method: GET
+      path: /projects
+      response: Project[]
+      filters: [status, q]
+    - method: POST
+      path: /projects
+      body: ProjectCreate
+      response: Project
+    - method: GET
+      path: /projects/{id}
+      response: Project
+  users:
+    - method: GET
+      path: /users
+      response: User[]
+      filters: [q, role]
+    - method: POST
+      path: /users
+      body: UserCreate
+      response: User
+    - method: GET
+      path: /users/{id}
+      response: User
+    - method: DELETE
+      path: /users/{id}

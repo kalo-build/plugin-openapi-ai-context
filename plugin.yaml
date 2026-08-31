@@ -1,0 +1,25 @@
+name: "@kalo-build/plugin-openapi-ai-context"
+displayName: "OpenAPI AI Context"
+description: "Generates an AI context summary (api_contracts.yaml) from an OpenAPI 3.1 specification for LLM agent consumption."
+version: "1.0.0"
+
+input:
+  format: "KA:OA1:YAML1"
+  description: "OpenAPI 3.1 YAML specification"
+  suggestedStore:
+    name: "KA_OA_YAML"
+    type: "localFileSystem"
+    path: "./docs/openapi"
+
+output:
+  format: "KA:AC1:YAML1"
+  description: "AI context files for LLM agents"
+  suggestedStore:
+    name: "KA_AC_YAML"
+    type: "localFileSystem"
+    path: "./ai-context"
+
+configSchema:
+  specFileName:
+    type: string
+    description: "Name of the OpenAPI spec file to read (default: openapi.yaml)"
